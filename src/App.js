@@ -2,17 +2,31 @@ import React from 'react';
 import './App.css';
 import * as _ from 'lodash';
 
-const colors = ['black', 'blue', 'red', 'green', 'yellow'];
 
+const colors = [ 'black', 'blue', 'red', 'green', 'yellow', 'purple' ];
+const randomColors = () => {
+  const meaningWord = _.sample(colors);
+  const inkWord = _.sample(colors);
+  const inkColor = _.sample(colors);
+
+  return {
+    meaningWord,
+    inkWord,
+    inkColor, 
+    meaningInkMatch: meaningWord === inkColor,
+  };
+};
 
 class Game extends React.Component {
   state = {
-    meaningWord: _.sample(colors),
-    inkWord: _.sample(colors),
-    inkColor: _.sample(colors),
-    gameStatus: 'playing', // Possible other values: correct, wrong
+    gameStatus: 'playing', 
   };
 
+
+
+
+
+  colorValues = randomColors();
 
   handleClick = (yesClick) => {
 
@@ -21,23 +35,35 @@ class Game extends React.Component {
         return null;
       }
       const meaningInkMatch = prevState.meaningWord === prevState.inkColor;
-      const correct = (meaningInkMatch ^ yesClick) === 0;
-      return { gameStatus: correct ? 'correct' : 'wrong' };
-    }, this.resetGameAfterDelay() );
+      const correctClick = (this.colorValues.meaningInkMatch ^ yesClick) === 0;
+      return { gameStatus: correctClick ? 'correct' : 'wrong' };
+    }, this.resetGameAfterDelay());
   };
 
   resetGameAfterDelay = () => {
     setTimeout(() => {
+
+      this.colorValues = randomColors();
+
       this.setState({
-        meaningWord: _.sample(colors),
-        inkWord: _.sample(colors),
-        inkColor: _.sample(colors),
         gameStatus: 'playing',
       })
     }, 500);
   }
 
+ 
+
+
   render() {
+
+    const {
+      meaningWord,
+      inkWord,
+      inkColor,
+    } = this.colorValues;
+
+    const { gameStatus } = this.state;
+
     return (
       <div className="game">
         <div className="help">
@@ -51,13 +77,13 @@ class Game extends React.Component {
               }`}
           />
           <div className="meaning">
-            {this.state.meaningWord.toUpperCase()}
+            {meaningWord.toUpperCase()}
           </div>
           <div
             className="ink"
-            style={{ color: this.state.inkColor }}
+            style={{ color: inkColor.toUpperCase() }}
           >
-            {this.state.inkWord.toUpperCase()}
+            {inkWord.toUpperCase()}
           </div>
           <div className="buttons">
             <button onClick={() => this.handleClick(true)}>YES</button>
